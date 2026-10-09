@@ -90,4 +90,4 @@ none.
 
 ## Known exceptions
 - No `rules-ignore` or lint suppressions are used.
-- Intermittent test-process crash (4 of ~35 runs while building the project): `EXC_BAD_ACCESS` in Core Data `_generateTriggerSQL` while a CoreDatabase test opens an in-memory container; the cause is not proven. `AppDatabase` serializes container creation as a mitigation (unverified). If the gate shows "the test process crashed", re-run once and keep the crash report.
+- Intermittent test-process crash (3 crash reports in roughly 45-50 launches of the CoreDatabase tests while building this project; one more was seen earlier while the skill itself was being validated): `EXC_BAD_ACCESS` in Core Data `_generateTriggerSQL` while a CoreDatabase test opens an in-memory container; the cause is not proven. `AppDatabase` serializes container creation as a mitigation (unverified). If the gate shows "the test process crashed", re-run once and keep the crash report.
