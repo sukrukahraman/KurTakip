@@ -1,0 +1,4 @@
+// Shared by every environment. Per-developer values (DEVELOPMENT_TEAM, real keys) go in Secrets.xcconfig, which is git-ignored.
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+DEVELOPMENT_TEAM = 

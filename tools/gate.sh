@@ -24,7 +24,13 @@ report() { # name status [log]
   else
     echo "FAIL  $name${log:+  (log: ${log#$ROOT/})}"; summary+=("$name ✗"); fail=1
     if [ -n "$log" ]; then
-      { grep -E "error:|✘|^LOW|^VIOLATION|swiftformat:" "$log" | grep -v "CoreData:" | short | head -30; } | sed 's/^/      /'
+      { grep -E "error:|✘|^LOW|^VIOLATION|swiftformat:|Restarting after unexpected exit|^	[A-Za-z0-9_]+\.[A-Za-z0-9_]+\(" "$log" \
+          | grep -v "CoreData:" | short | awk '!seen[$0]++' | head -30; } | sed 's/^/      /'
+      if grep -q "Restarting after unexpected exit" "$log"; then
+        local ips; ips="$(ls -t "$HOME"/Library/Logs/DiagnosticReports/xctest-*.ips 2>/dev/null | head -1)"
+        echo "      the test process crashed, so every test of the module counts as failed. Crashes can be intermittent:"
+        echo "      re-run once; if it repeats, read ${ips:-the newest xctest-*.ips in ~/Library/Logs/DiagnosticReports} before changing code."
+      fi
     fi
   fi
 }
@@ -83,7 +89,13 @@ run_static() { # logfile
   if [ ${#MODULES[@]} -eq 0 ]; then for d in Packages App AppTests AppUITests; do [ -d "$d" ] && paths+=("$d"); done
   else for m in "${MODULES[@]}"; do [ "$m" = App ] && paths+=(App AppTests AppUITests) || paths+=("$(module_dir "$m")"); done; fi
   swiftformat "${paths[@]}" --lint >>"$log" 2>&1 || { status=1; echo "swiftformat: run 'swiftformat .' to fix formatting" >>"$log"; }
-  swiftlint lint --strict --quiet "${paths[@]}" 2>&1 | short >>"$log"; [ "${PIPESTATUS[0]}" = 0 ] || status=1
+  # `included:` in .swiftlint.yml would make every module run lint the whole project, so one half-written module failed all the others.
+  local lint_cfg=()
+  if [ ${#MODULES[@]} -gt 0 ]; then
+    sed '/^included:/,/^excluded:/{/^excluded:/!d;}' .swiftlint.yml >"$LOG_DIR/swiftlint-scoped.yml"
+    lint_cfg=(--config "$LOG_DIR/swiftlint-scoped.yml")
+  fi
+  swiftlint lint --strict --quiet ${lint_cfg[@]+"${lint_cfg[@]}"} "${paths[@]}" 2>&1 | short | awk '!seen[$0]++' >>"$log"; [ "${PIPESTATUS[0]}" = 0 ] || status=1
   return $status
 }
 

@@ -1,0 +1,10 @@
+#include "Base.xcconfig"
+
+APP_DISPLAY_NAME = Kur Takip
+BUNDLE_ID_SUFFIX =
+// In .xcconfig files "//" starts a comment, so every URL spells its scheme as https:/$()/host.
+API_BASE_URL = https:/$()/api.frankfurter.dev/v1/
+API_CERT_PINS =
+DEEP_LINK_HOST = kurtakip.example.com
+
+#include? "Secrets.xcconfig"

@@ -4,32 +4,26 @@ import PackageDescription
 let strict: [SwiftSetting] = [.treatAllWarnings(as: .error)]
 
 let package = Package(
-    name: "CoreTesting",
+    name: "CoreDatabase",
     platforms: [.iOS(.v17)],
-    products: [.library(name: "CoreTesting", targets: ["CoreTesting"])],
+    products: [.library(name: "CoreDatabase", targets: ["CoreDatabase"])],
     dependencies: [
-        .package(path: "../CoreCommon"),
-        .package(path: "../CoreLocalization"),
-        .package(path: "../CoreRepository"),
         .package(path: "../CoreModel"),
         // <skill:package-deps>
     ],
     targets: [
         .target(
-            name: "CoreTesting",
+            name: "CoreDatabase",
             dependencies: [
-                "CoreCommon",
-                "CoreLocalization",
-                "CoreRepository",
                 "CoreModel",
                 // <skill:target-deps>
             ],
             swiftSettings: strict
         ),
         .testTarget(
-            name: "CoreTestingTests",
+            name: "CoreDatabaseTests",
             dependencies: [
-                "CoreTesting",
+                "CoreDatabase",
                 // <skill:test-deps>
             ],
             swiftSettings: strict

@@ -5,11 +5,16 @@
   "BUNDLE_ID": "com.example.kurtakip",
   "DEVICE_FAMILY": "1",
   "DEV_REGION": "tr",
+  "FEATURE_PASCAL": "RateDetail",
   "FIRST_FEATURE_PASCAL": "RatesList",
   "LANGUAGES": "tr,en",
   "LOCALIZATIONS_YAML": "[tr, en]",
   "MIN_IOS": "17.0",
   "MIN_IOS_MAJOR": "17",
+  "PRODUCTION_DOMAIN": "kurtakip.example.com",
+  "PRODUCTION_HOST": "api.frankfurter.dev",
   "PROJECT_NAME": "KurTakip",
+  "STAGING_HOST": "api.frankfurter.dev",
+  "TEAM_ID": "",
   "VIEWINSPECTOR_VERSION": "0.10.5"
 }

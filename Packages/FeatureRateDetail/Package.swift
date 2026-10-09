@@ -4,32 +4,40 @@ import PackageDescription
 let strict: [SwiftSetting] = [.treatAllWarnings(as: .error)]
 
 let package = Package(
-    name: "CoreTesting",
+    name: "FeatureRateDetail",
     platforms: [.iOS(.v17)],
-    products: [.library(name: "CoreTesting", targets: ["CoreTesting"])],
+    products: [.library(name: "FeatureRateDetail", targets: ["FeatureRateDetail"])],
     dependencies: [
         .package(path: "../CoreCommon"),
+        .package(path: "../CoreDesignSystem"),
         .package(path: "../CoreLocalization"),
-        .package(path: "../CoreRepository"),
+        .package(path: "../CoreUI"),
+        .package(path: "../CoreTesting"),
+        .package(url: "https://github.com/nalexn/ViewInspector", exact: "0.10.5"),
         .package(path: "../CoreModel"),
+        .package(path: "../CoreRepository"),
         // <skill:package-deps>
     ],
     targets: [
         .target(
-            name: "CoreTesting",
+            name: "FeatureRateDetail",
             dependencies: [
                 "CoreCommon",
+                "CoreDesignSystem",
                 "CoreLocalization",
-                "CoreRepository",
+                "CoreUI",
                 "CoreModel",
+                "CoreRepository",
                 // <skill:target-deps>
             ],
             swiftSettings: strict
         ),
         .testTarget(
-            name: "CoreTestingTests",
+            name: "FeatureRateDetailTests",
             dependencies: [
+                "FeatureRateDetail",
                 "CoreTesting",
+                .product(name: "ViewInspector", package: "ViewInspector"),
                 // <skill:test-deps>
             ],
             swiftSettings: strict

@@ -1,0 +1,22 @@
+import CoreModel
+import CoreNetwork
+import Foundation
+
+extension RatesDto {
+    /// The quotes inverted to "lira per unit", sorted by code. Nil when the quote date is malformed.
+    /// Currencies without a positive rate are dropped, because inverting them is meaningless.
+    func toDomain() -> [ExchangeRate]? {
+        let quotedOn: Date
+        do {
+            quotedOn = try Date.ISO8601FormatStyle().year().month().day().parse(date)
+        } catch {
+            return nil // a malformed day means the whole answer is unusable
+        }
+        return rates
+            .compactMap { code, unitsPerLira in
+                guard unitsPerLira > 0 else { return nil }
+                return ExchangeRate(code: code, tryPerUnit: 1 / unitsPerLira, quotedOn: quotedOn)
+            }
+            .sorted { $0.code < $1.code }
+    }
+}

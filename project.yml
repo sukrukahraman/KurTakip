@@ -1,0 +1,185 @@
+# Generated Xcode project spec (XcodeGen). `xcodegen generate` writes KurTakip.xcodeproj, which is git-ignored.
+# Edit this file or run scripts/modules.py; never edit the .xcodeproj. Keep the `# <skill:...>` markers.
+name: KurTakip
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: tr
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+# ENV-01: one configuration pair per environment; everything that differs lives in Config/<Environment>.xcconfig.
+configs:
+  Debug-Staging: debug
+  Release-Staging: release
+  Debug-Production: debug
+  Release-Production: release
+configFiles:
+  Debug-Staging: Config/Staging.xcconfig
+  Release-Staging: Config/Staging.xcconfig
+  Debug-Production: Config/Production.xcconfig
+  Release-Production: Config/Production.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+  configs:
+    debug:
+      SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+      ENABLE_TESTABILITY: YES
+      DEBUG_INFORMATION_FORMAT: dwarf
+    release:
+      # HARD-03: optimized, stripped, symbols kept as dSYM for crash symbolication.
+      SWIFT_COMPILATION_MODE: wholemodule
+      SWIFT_OPTIMIZATION_LEVEL: -O
+      STRIP_INSTALLED_PRODUCT: YES
+      COPY_PHASE_STRIP: YES
+      DEBUG_INFORMATION_FORMAT: dwarf-with-dsym
+      ENABLE_TESTABILITY: NO
+      VALIDATE_PRODUCT: YES
+
+packages:
+  CoreDesignSystem:
+    path: Packages/CoreDesignSystem
+  CoreCommon:
+    path: Packages/CoreCommon
+  CoreModel:
+    path: Packages/CoreModel
+  CoreLocalization:
+    path: Packages/CoreLocalization
+  CoreTesting:
+    path: Packages/CoreTesting
+  CoreUI:
+    path: Packages/CoreUI
+  CoreNetwork:
+    path: Packages/CoreNetwork
+  CoreDatabase:
+    path: Packages/CoreDatabase
+  CoreRepository:
+    path: Packages/CoreRepository
+  FeatureRatesList:
+    path: Packages/FeatureRatesList
+  FeatureRateDetail:
+    path: Packages/FeatureRateDetail
+  # <skill:packages>
+
+targets:
+  KurTakip:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.kurtakip$(BUNDLE_ID_SUFFIX)
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleDevelopmentRegion: tr
+        CFBundleLocalizations: [tr, en]
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+        # Environment values from the active xcconfig; read by AppConfiguration at launch.
+        API_BASE_URL: $(API_BASE_URL)
+        API_CERT_PINS: $(API_CERT_PINS)
+        DEEP_LINK_HOST: $(DEEP_LINK_HOST)
+        # <skill:info-plist>
+    dependencies:
+      - package: CoreDesignSystem
+      - package: CoreNetwork
+      - package: CoreDatabase
+      - package: CoreRepository
+      - package: FeatureRatesList
+      - package: CoreCommon
+      - package: FeatureRateDetail
+      # <skill:app-dependencies>
+
+  KurTakipTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: AppTests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: KurTakip
+      # <skill:test-dependencies>
+
+  KurTakipUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: AppUITests
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: KurTakip
+
+schemes:
+  # Day-to-day scheme and the one the quality gate tests: the app's tests plus every package's tests.
+  KurTakip-Staging:
+    build:
+      targets:
+        KurTakip: all
+    run:
+      config: Debug-Staging
+      diagnostics:
+        mainThreadChecker: true
+    test:
+      config: Debug-Staging
+      gatherCoverageData: true
+      targets:
+        - KurTakipTests
+        - package: CoreCommon/CoreCommonTests
+        - package: CoreLocalization/CoreLocalizationTests
+        - package: CoreTesting/CoreTestingTests
+        - package: CoreUI/CoreUITests
+        - package: CoreDesignSystem/CoreDesignSystemTests
+        - package: CoreNetwork/CoreNetworkTests
+        - package: CoreDatabase/CoreDatabaseTests
+        - package: CoreRepository/CoreRepositoryTests
+        - package: FeatureRatesList/FeatureRatesListTests
+        - package: FeatureRateDetail/FeatureRateDetailTests
+        # <skill:scheme-tests>
+    profile:
+      config: Release-Staging
+    analyze:
+      config: Debug-Staging
+    archive:
+      config: Release-Staging
+  KurTakip-Production:
+    build:
+      targets:
+        KurTakip: all
+    run:
+      config: Debug-Production
+    profile:
+      config: Release-Production
+    archive:
+      config: Release-Production
+  # End-to-end UI tests on a simulator (CI-04). Slow, so they are not part of the gate's unit-test run.
+  KurTakip-UITests:
+    build:
+      targets:
+        KurTakip: all
+    test:
+      config: Debug-Staging
+      targets:
+        - KurTakipUITests
