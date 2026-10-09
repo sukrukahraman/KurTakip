@@ -1,0 +1,44 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Run the same quality gate CI runs"
+  lane :gate do
+    sh("../tools/gate.sh", "..")
+  end
+
+  desc "Build an environment and upload it to TestFlight: fastlane beta [environment:Staging|Production]"
+  lane :beta do |options|
+    environment = options[:environment] || "Production"
+    UI.user_error!("environment must be Staging or Production") unless %w[Staging Production].include?(environment)
+    app_identifier = "com.example.kurtakip" + (environment == "Staging" ? ".stage" : "")
+
+    key_path = File.expand_path("../build/AuthKey.p8", __dir__)
+    FileUtils.mkdir_p(File.dirname(key_path))
+    File.write(key_path, Base64.decode64(ENV.fetch("ASC_KEY_P8_BASE64")))
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_filepath: key_path
+    )
+    build_number = latest_testflight_build_number(api_key: api_key, app_identifier: app_identifier) + 1
+
+    sh("cd .. && xcodegen generate")
+    build_app(
+      project: "KurTakip.xcodeproj",
+      scheme: "KurTakip-#{environment}",
+      configuration: "Release-#{environment}",
+      export_method: "app-store",
+      output_directory: "build/ipa",
+      xcargs: [
+        "-allowProvisioningUpdates",
+        "-authenticationKeyPath #{key_path}",
+        "-authenticationKeyID #{ENV.fetch('ASC_KEY_ID')}",
+        "-authenticationKeyIssuerID #{ENV.fetch('ASC_ISSUER_ID')}",
+        "CURRENT_PROJECT_VERSION=#{build_number}",
+        "DEVELOPMENT_TEAM=#{ENV.fetch('APPLE_TEAM_ID')}"
+      ].join(" ")
+    )
+    upload_to_testflight(api_key: api_key, app_identifier: app_identifier, skip_waiting_for_build_processing: true)
+  end
+end

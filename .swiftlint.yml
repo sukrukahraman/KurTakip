@@ -1,0 +1,83 @@
+# Static analysis (BUILD-01, CORE-*). Run strict: `swiftlint lint --strict`, so every warning fails the gate.
+# Never add a baseline or blanket-disable a rule; use `// swiftlint:disable:next <rule> // justified: <reason>` (CORE-10).
+included:
+  - Packages
+  - App
+  - AppTests
+  - AppUITests
+excluded:
+  - "**/.build"
+  - "**/Resources"
+  - "**/DerivedData"
+  - build
+
+opt_in_rules:
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - discouraged_optional_boolean
+  - empty_count
+  - empty_string
+  - fatal_error_message
+  - first_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - joined_default_parameter
+  - last_where
+  - legacy_multiple
+  - overridden_super_call
+  - private_action
+  - private_outlet
+  - redundant_nil_coalescing
+  - sorted_first_last
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_whitespace_closing_braces
+  - yoda_condition
+
+disabled_rules:
+  - trailing_comma          # swiftformat owns commas
+  - opening_brace           # swiftformat owns braces
+  - multiple_closures_with_trailing_closure   # SwiftUI's own idiom: Card(action: {}) { content }
+
+# CORE-01, CORE-02: small functions, files <= 300 lines (hard stop 500).
+file_length:
+  warning: 300
+  error: 500
+  ignore_comment_only_lines: true
+function_body_length:
+  warning: 40
+  error: 80
+type_body_length:
+  warning: 250
+  error: 400
+cyclomatic_complexity:
+  warning: 10
+  error: 20
+function_parameter_count:
+  warning: 6
+  error: 8
+line_length:
+  warning: 120
+  error: 160
+  ignores_urls: true
+  ignores_comments: true
+  ignores_interpolated_strings: true
+nesting:
+  type_level: 2
+identifier_name:
+  min_length: 2
+  excluded: [id, x, y, i, to, on]
+type_name:
+  min_length: 3
+force_cast: error
+force_try: error
+force_unwrapping: error
+todo: error   # CORE-09: unfinished work lives in docs/TASKS.md, never in code
+
+custom_rules:
+  no_print:
+    name: "No print/NSLog/debugPrint"
+    regex: '^(?!\s*//).*\b(print|debugPrint|NSLog|dump)\('
+    message: "Log through AppLogger (OBS-01, SEC-06); print and NSLog are forbidden."
+    severity: error
+    excluded: ".*/Tests/.*|.*Tests/.*"

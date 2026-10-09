@@ -1,0 +1,32 @@
+# Dependency vulnerability scan (HARD-08, CI-03). Secret: NVD_API_KEY (free key from nvd.nist.gov).
+# OWASP dependency-check understands Swift packages through its experimental analyzer, which reads Package.swift.
+name: Dependency scan
+
+on:
+  pull_request:
+    paths: ['Packages/*/Package.swift']
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  owasp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: OWASP dependency-check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'Kur Takip'
+          path: 'Packages'
+          format: 'HTML'
+          args: >
+            --enableExperimental
+            --failOnCVSS 7
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: reports/

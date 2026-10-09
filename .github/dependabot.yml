@@ -1,0 +1,13 @@
+# Keeps third-party packages and workflow actions current (BUILD-05). Versions in Package.swift are exact pins,
+# so every update arrives as a reviewable pull request that the CI gate checks.
+version: 2
+updates:
+  - package-ecosystem: swift
+    directories:
+      - "/Packages/*"
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

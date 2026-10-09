@@ -1,0 +1,33 @@
+# PR gate (CI-01): the same script the developer runs, so a green local gate means a green PR.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Install tools
+        run: brew install xcodegen swiftlint swiftformat
+      - name: Quality gate (build, SwiftFormat, SwiftLint, tests, coverage, rules, dead code)
+        run: tools/gate.sh .
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-results
+          path: |
+            build/gate/*.log
+            build/gate/*.xcresult

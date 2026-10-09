@@ -1,0 +1,15 @@
+{
+  "APP_DESCRIPTION": "TL bazl\u0131 d\u00f6viz kurlar\u0131n\u0131 g\u00f6steren, \u00e7evrimd\u0131\u015f\u0131 da \u00e7al\u0131\u015fan kur takip uygulamas\u0131",
+  "APP_NAME": "Kur Takip",
+  "APP_PREFIX": "KurTakip",
+  "BUNDLE_ID": "com.example.kurtakip",
+  "DEVICE_FAMILY": "1",
+  "DEV_REGION": "tr",
+  "FIRST_FEATURE_PASCAL": "RatesList",
+  "LANGUAGES": "tr,en",
+  "LOCALIZATIONS_YAML": "[tr, en]",
+  "MIN_IOS": "17.0",
+  "MIN_IOS_MAJOR": "17",
+  "PROJECT_NAME": "KurTakip",
+  "VIEWINSPECTOR_VERSION": "0.10.5"
+}
