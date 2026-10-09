@@ -124,6 +124,22 @@ struct RatesListViewModelTests {
     }
 
     @Test
+    func start_afterACancelledRefresh_refreshesAgainOnTheNextStart() async {
+        repository.emit([usd])
+        repository.setRefreshCancelled(true)
+        let viewModel = makeViewModel()
+        await viewModel.start()
+        #expect(repository.refreshCount == 1)
+
+        repository.setRefreshCancelled(false)
+        await viewModel.start()
+
+        #expect(repository.refreshCount == 2)
+        await viewModel.start()
+        #expect(repository.refreshCount == 2) // finished now: no third refresh for this attempt
+    }
+
+    @Test
     func givenAQuery_thenOnlyMatchingCodesOrNamesRemain() async {
         repository.emit([usd, eur])
         let viewModel = makeViewModel()

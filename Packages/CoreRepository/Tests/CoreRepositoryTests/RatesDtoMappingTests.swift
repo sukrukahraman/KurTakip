@@ -33,6 +33,11 @@ struct RatesDtoMappingTests {
     }
 
     @Test
+    func toDomain_quotesBasedOnAnotherCurrency_areNil() {
+        #expect(RatesDto(base: "EUR", date: "2026-10-08", rates: ["USD": 1.08]).toDomain() == nil)
+    }
+
+    @Test
     func toDomain_malformedDate_isNil() {
         #expect(RatesDto(base: "TRY", date: "yesterday", rates: ["USD": 0.02]).toDomain() == nil)
     }

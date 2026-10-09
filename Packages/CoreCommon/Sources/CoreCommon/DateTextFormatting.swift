@@ -6,16 +6,17 @@ public protocol DateTextFormatting: Sendable {
     func text(for date: Date) -> String
 }
 
+/// Formats a calendar day that the data layer stores as UTC midnight (an API quote date). It always reads in GMT, so
+/// the
+/// day is the same in every time zone: formatting in the local zone showed the previous day west of Greenwich.
 public struct LocalizedDateTextFormatter: DateTextFormatting {
     private let locale: Locale
-    private let timeZone: TimeZone
 
-    public init(locale: Locale = .current, timeZone: TimeZone = .current) {
+    public init(locale: Locale = .current) {
         self.locale = locale
-        self.timeZone = timeZone
     }
 
     public func text(for date: Date) -> String {
-        date.formatted(Date.FormatStyle(date: .long, time: .omitted, locale: locale, timeZone: timeZone))
+        date.formatted(Date.FormatStyle(date: .long, time: .omitted, locale: locale, timeZone: .gmt))
     }
 }

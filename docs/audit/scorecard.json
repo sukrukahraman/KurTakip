@@ -1,0 +1,63 @@
+{
+  "overall": 100.0,
+  "band": "Excellent",
+  "categories": {
+    "Architecture": {
+      "score": 10.0,
+      "weight": 20,
+      "evidence": [
+        "no findings"
+      ]
+    },
+    "Security": {
+      "score": 10.0,
+      "weight": 15,
+      "evidence": [
+        "no findings"
+      ]
+    },
+    "Code Quality": {
+      "score": 10.0,
+      "weight": 15,
+      "evidence": [
+        "no findings"
+      ]
+    },
+    "Testing": {
+      "score": 10.0,
+      "weight": 15,
+      "evidence": [
+        "test/source ratio 0.53"
+      ]
+    },
+    "Performance": {
+      "score": 10.0,
+      "weight": 10,
+      "evidence": [
+        "no findings"
+      ]
+    },
+    "Build Health": {
+      "score": 10.0,
+      "weight": 10,
+      "evidence": [
+        "no findings"
+      ]
+    },
+    "Deprecated APIs": {
+      "score": 10.0,
+      "weight": 7,
+      "evidence": [
+        "0.0% of files use deprecated or legacy APIs"
+      ]
+    },
+    "CI/CD": {
+      "score": 10.0,
+      "weight": 8,
+      "evidence": [
+        "have: PR gate, release automation, dependency scan, dependabot, fastlane lanes"
+      ]
+    }
+  },
+  "target_met": true
+}

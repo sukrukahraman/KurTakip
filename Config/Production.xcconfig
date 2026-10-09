@@ -4,7 +4,7 @@ APP_DISPLAY_NAME = Kur Takip
 BUNDLE_ID_SUFFIX =
 // In .xcconfig files "//" starts a comment, so every URL spells its scheme as https:/$()/host.
 API_BASE_URL = https:/$()/api.frankfurter.dev/v1/
-API_CERT_PINS =
+API_CERT_PINS = sha256/kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=,sha256/mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=,sha256/hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=,sha256/C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=,sha256/K87oWBWM9UZfyddvDfoxL+8lpNyoUB2ptGtn0fv6G2Q=
 DEEP_LINK_HOST = kurtakip.example.com
 
 #include? "Secrets.xcconfig"

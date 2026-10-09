@@ -50,6 +50,16 @@ struct FakeRatesRepositoryTests {
     }
 
     @Test
+    func refresh_whenSetCancelled_throwsCancellationAndStillCounts() async {
+        let repository = FakeRatesRepository()
+        repository.setRefreshCancelled(true)
+
+        await #expect(throws: CancellationError.self) { try await repository.refresh() }
+
+        #expect(repository.refreshCount == 1)
+    }
+
+    @Test
     func fakeFormatters_areDeterministic() {
         #expect(FakeDateTextFormatter().text(for: Date(timeIntervalSince1970: 7)) == "date-7")
         #expect(FakeCurrencyTextFormatter().name(forCode: "USD") == "name-USD")

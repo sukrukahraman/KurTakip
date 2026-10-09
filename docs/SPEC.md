@@ -67,7 +67,7 @@ none.
 ## Hardening
 | # | Item | Applies | How / why N/A |
 |---|---|---|---|
-| 1 | Pinning | yes | api.frankfurter.dev intermediate + root + backup roots, procedure HARD-01, recorded in Stage E |
+| 1 | Pinning | yes | Production only (Staging stays unpinned). SPKI pins in Config/Production.xcconfig `API_CERT_PINS`, read 2026-10-09 with `openssl s_client` from api.frankfurter.dev:443 (leaf CN=frankfurter.dev, issuer GTS WE1; chain verified OK): intermediate **GTS WE1** `sha256/kIdp6NNEd8wsugYyyIYFsi1ylMCED3hZbSR8ZFsa/A4=`, root **GTS Root R4** `sha256/mEflZT5enoR1FuXLgYYGqnVEoZvmf9c2bVBpiOjYQ0c=` (identical to the macOS system-store certificate). Backup roots from the macOS system trust store (`security find-certificate -c`): GTS Root R1 `sha256/hxqRlPTu1bMS/0DITB1SSu0vd4u/8l8TjPgfaAp63Gc=`, ISRG Root X1 `sha256/C5+lpZ7tcVwmwQIMcRtPbsQtWLABXhQzejna0wHFr8M=`, GlobalSign Root CA `sha256/K87oWBWM9UZfyddvDfoxL+8lpNyoUB2ptGtn0fv6G2Q=`. The leaf is not pinned (rotates ~90 days: current one expires 2026-12-20). **To be confirmed by the user.** |
 | 2 | Encryption at rest | N/A | no tokens or personal data are stored |
 | 3 | Release hardening | yes | template Release settings |
 | 4 | App Attest | N/A | no sensitive data |
@@ -89,4 +89,5 @@ Sensitive-app defaults (SEC-07): no.
 none.
 
 ## Known exceptions
-none yet.
+- No `rules-ignore` or lint suppressions are used.
+- Intermittent test-process crash (4 of ~35 runs while building the project): `EXC_BAD_ACCESS` in Core Data `_generateTriggerSQL` while a CoreDatabase test opens an in-memory container; the cause is not proven. `AppDatabase` serializes container creation as a mitigation (unverified). If the gate shows "the test process crashed", re-run once and keep the crash report.

@@ -11,6 +11,7 @@ public final class FakeRatesRepository: RatesRepository {
         var observeFailure: (any Error)?
         var refreshResult: AppResult<Void> = .success(())
         var refreshCount = 0
+        var refreshCancelled = false
         var continuations: [AsyncThrowingStream<[ExchangeRate], Error>.Continuation] = []
     }
 
@@ -40,6 +41,11 @@ public final class FakeRatesRepository: RatesRepository {
         state.withLock { $0.refreshResult = result }
     }
 
+    /// Makes `refresh()` throw `CancellationError`, as a refresh does when its screen goes away.
+    public func setRefreshCancelled(_ cancelled: Bool) {
+        state.withLock { $0.refreshCancelled = cancelled }
+    }
+
     public func observeRates() async -> AsyncThrowingStream<[ExchangeRate], Error> {
         let (stream, continuation) = AsyncThrowingStream.makeStream(of: [ExchangeRate].self, throwing: Error.self)
         let snapshot = state.withLock { state in
@@ -56,9 +62,11 @@ public final class FakeRatesRepository: RatesRepository {
     }
 
     public func refresh() async throws(CancellationError) -> AppResult<Void> {
-        state.withLock { state in
+        let (result, cancelled) = state.withLock { state in
             state.refreshCount += 1
-            return state.refreshResult
+            return (state.refreshResult, state.refreshCancelled)
         }
+        if cancelled { throw CancellationError() }
+        return result
     }
 }

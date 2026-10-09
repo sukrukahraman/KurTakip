@@ -11,6 +11,17 @@ private let creationLock = OSAllocatedUnfairLock()
 public struct AppDatabase: Sendable {
     public let container: ModelContainer
 
+    /// Opens the on-disk store, or an in-memory one when that fails (corrupt file, failed migration, full disk). The
+    /// store
+    /// only caches data the network can fetch again, so a broken cache must not keep the app from launching.
+    public static func openCache(storeURL: URL? = nil) throws -> AppDatabase {
+        do {
+            return try AppDatabase(storeURL: storeURL)
+        } catch {
+            return try AppDatabase(inMemory: true)
+        }
+    }
+
     /// `storeURL` lets a migration test open a store file written by an older schema version.
     public init(inMemory: Bool = false, storeURL: URL? = nil) throws {
         if !inMemory, storeURL == nil {

@@ -10,8 +10,14 @@ final class RatesListViewModel {
     private let repository: any RatesRepository
     private let mapper: RateItemUiMapper
 
+    /// The cached rates, mapped once per emission instead of on every `uiState` read.
+    private struct Snapshot {
+        let items: [RateItemUi]
+        let updatedOnText: String
+    }
+
     // Inputs. The screen only ever reads `uiState`, which is a pure function of them (ARCH-03).
-    private var rates: [ExchangeRate]?
+    private var snapshot: Snapshot?
     private var observationFailed = false
     private var isRefreshing = false
     private var refreshError: AppError?
@@ -30,11 +36,11 @@ final class RatesListViewModel {
 
     var uiState: RatesListUiState {
         if observationFailed { return .error(.unknown) }
-        guard let rates else { return .loading }
-        if !rates.isEmpty {
+        guard let snapshot else { return .loading }
+        if !snapshot.items.isEmpty {
             return .content(RatesListContent(
-                rates: matches(rates.map(mapper.map)),
-                updatedOnText: mapper.updatedOnText(for: rates),
+                rates: matches(snapshot.items),
+                updatedOnText: snapshot.updatedOnText,
                 isSearching: !trimmedQuery.isEmpty,
                 refreshError: refreshError
             ))
@@ -54,21 +60,27 @@ final class RatesListViewModel {
     func observe() async {
         observationFailed = false
         do {
-            for try await latest in await repository.observeRates() { rates = latest }
+            for try await latest in await repository.observeRates() {
+                snapshot = Snapshot(items: latest.map(mapper.map), updatedOnText: mapper.updatedOnText(for: latest))
+            }
         } catch {
             observationFailed = true
         }
     }
 
-    func refresh() async {
-        guard !isRefreshing else { return }
+    /// True when the refresh ran to its end, successfully or with a typed error; false when it was skipped or
+    /// cancelled.
+    @discardableResult
+    func refresh() async -> Bool {
+        guard !isRefreshing else { return false }
         isRefreshing = true
         refreshError = nil // COMP-08: a stale error must not show during a new attempt
         defer { isRefreshing = false }
         do {
             refreshError = try await repository.refresh().error
+            return true
         } catch {
-            return // cancelled: the screen is gone, leave the state alone
+            return false // cancelled: the screen is gone, leave the state alone
         }
     }
 
@@ -96,7 +108,7 @@ final class RatesListViewModel {
 
     private func refreshOncePerAttempt() async {
         guard refreshedAttempt != observeAttempt else { return }
-        refreshedAttempt = observeAttempt
-        await refresh()
+        // Only a refresh that finished counts: one cancelled by leaving the screen must run again on return.
+        if await refresh() { refreshedAttempt = observeAttempt }
     }
 }

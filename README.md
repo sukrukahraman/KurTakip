@@ -23,6 +23,11 @@ tools/gate.sh .          # the same script CI runs
 tools/gate.sh . App      # one module (a package folder name under Packages/, or App)
 ```
 
+## Data source
+Rates come from the public [Frankfurter](https://frankfurter.dev) API (`GET /v1/latest?base=TRY`, ECB reference rates, one quote per
+working day). The repository inverts them to "lira per unit" and caches them in SwiftData, so the list also works offline.
+Production builds pin the TLS chain (`API_CERT_PINS` in `Config/Production.xcconfig`; source and date in `docs/SPEC.md`).
+
 ## Release
 Push a `v*` tag. CI builds the `KurTakip-Production` scheme and uploads it to TestFlight with the App Store Connect API key
 (secrets `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8_BASE64`, `APPLE_TEAM_ID`).
@@ -32,11 +37,15 @@ Push a `v*` tag. CI builds the `KurTakip-Production` scheme and uploads it to Te
 |---|---|
 | `App` | `@main`, composition root, navigation stack, per-environment configuration |
 | `CoreCommon` | `AppError`/`AppResult`, `AppLogger`, formatter protocols |
-| `CoreModel` | Pure Swift domain models |
+| `CoreModel` | Pure Swift domain models (`ExchangeRate`) |
+| `CoreNetwork` | `APIClient`, `safeApiCall` with retry, certificate pinning, the rates API |
+| `CoreDatabase` | SwiftData schema (versioned), `RateStore`, `AppDatabase.openCache()` |
+| `CoreRepository` | `RatesRepository` (offline-first), DTO mapping, `Repositories.live` |
 | `CoreDesignSystem` | Theme tokens and generic components |
 | `CoreUI` | Shared app components (loading, empty, error states) |
 | `CoreLocalization` | All user-facing text as String Catalogs, one catalog per feature |
 | `CoreTesting` | Test helpers and fakes |
-| `Feature*` | One module per feature |
+| `FeatureRatesList` | Rate list: search, pull to refresh, refresh-error banner, offline cache |
+| `FeatureRateDetail` | One rate and a lira-to-currency converter |
 
 See `docs/SPEC.md` for the features and `docs/audit/` for the latest scorecard.

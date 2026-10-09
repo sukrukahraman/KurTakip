@@ -34,12 +34,14 @@ public struct LocalizedCurrencyTextFormatter: CurrencyTextFormatting {
         text(amount, currencyCode: currencyCode, fractionDigits: fractionDigits)
     }
 
+    /// Digits with at most one decimal separator of the user's locale. Anything else (a grouping separator, the other
+    /// locale's separator, letters, a sign) is rejected: lenient number parsing silently read "1.5" as 1 in Turkish.
     public func parseAmount(_ text: String) -> Double? {
-        do {
-            return NSDecimalNumber(decimal: try Decimal(text, format: .number.locale(locale))).doubleValue
-        } catch {
-            return nil // not a number in the user's locale
-        }
+        let separator = locale.decimalSeparator ?? "."
+        let parts = text.components(separatedBy: separator)
+        let isPlainNumber = parts.count <= 2 && parts.allSatisfy { $0.allSatisfy(\.isASCIIDigit) }
+        guard isPlainNumber, text.contains(where: \.isASCIIDigit) else { return nil }
+        return Double(parts.joined(separator: "."))
     }
 
     private func text(_ value: Double, currencyCode: String, fractionDigits: Int) -> String {
@@ -47,4 +49,8 @@ public struct LocalizedCurrencyTextFormatter: CurrencyTextFormatting {
             .currency(code: currencyCode).locale(locale).precision(.fractionLength(fractionDigits))
         )
     }
+}
+
+private extension Character {
+    var isASCIIDigit: Bool { isASCII && isNumber }
 }

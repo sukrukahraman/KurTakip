@@ -127,13 +127,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Last updated: %@"
+            "value" : "Rates as of %@"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Son güncelleme: %@"
+            "value" : "Kur tarihi: %@"
           }
         }
       }

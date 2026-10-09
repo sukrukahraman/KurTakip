@@ -15,9 +15,9 @@ final class AppContainer {
 
     init(configuration: AppConfiguration = .live()) {
         do {
-            repositories = .live(apiConfig: configuration.apiConfig, database: try AppDatabase())
+            repositories = .live(apiConfig: configuration.apiConfig, database: try AppDatabase.openCache())
         } catch {
-            preconditionFailure("Could not open the local database: \(error)")
+            preconditionFailure("Could not open even an in-memory database: \(error)")
         }
         // <skill:container-init>
     }
